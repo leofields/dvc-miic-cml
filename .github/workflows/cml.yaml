@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: r-lib/actions/setup-r@master
         with:
-          version: '3.6.1'
+          r-version: '3.6.1'
       - uses: actions/checkout@v2
       - name: cml_run
         env:
@@ -30,6 +30,13 @@ jobs:
           # Run DVC
           dvc pull
           Rscript infer_network.R
+          
+          # Install CML
+          npm init --yes
+          npm i @dvcorg/cml@latest
           # Write your CML report
-          echo "MODEL METRICS"
-          cat metrics.txt
+          echo "## Model Metrics" > report.md
+          cat metrics.txt >> report.md
+          echo "## Data visualization" >> report.md
+          npx cml-publish network_diagram.png --md >> report.md
+          npx cml-send-comment report.md
